@@ -218,7 +218,7 @@ class PolicyResolver {
 				foreach ($uids as $uid) {
 					$user = $users[$uid];
 					$enabled = [];
-					foreach (GrantMatrix::MODULE_APPS as $module => $app) {
+					foreach (GrantMatrix::moduleApps() as $module => $app) {
 						$enabled[$module] = !$grantsOnly && ($app === '' || $app === 'files'
 							|| ($user !== null && AppEnablement::forUser($this->apps, $app, $user)));
 					}
@@ -259,7 +259,7 @@ class PolicyResolver {
 	/** @return list<string> every user policy key: eligibility, connection and each catalog grant */
 	private static function keys(): array {
 		$keys = [GrantPolicy::ELIGIBLE_KEY, GrantPolicy::CONNECTED_KEY];
-		foreach (GrantCatalog::CATALOG as $module => $operations) {
+		foreach (GrantCatalog::all() as $module => $operations) {
 			foreach ($operations as $operation) {
 				$keys[] = 'grant_' . $module . '_' . $operation;
 			}

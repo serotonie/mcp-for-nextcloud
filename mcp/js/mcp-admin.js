@@ -1201,6 +1201,8 @@
 		 * @return {string} description
 		 */
 		function operationHint(module, operation) {
+			const extension = context.state.data?.extensions?.[module]
+			if (extension) return extension.operations[operation] + ' (' + t('mcp', 'None') + ')'
 			if (module === 'talk' && operation === 'create') {
 				return t('mcp', 'Open new conversations, which invites people')
 			}
@@ -1263,7 +1265,11 @@
 			}
 		}
 
-		Object.assign(context, { levelLabels, moduleLabels, operationHint, operationLabels })
+		function extensionModuleLabels() {
+			return { ...moduleLabels(), ...Object.fromEntries(Object.entries(context.state.data?.extensions || {}).map(([id, metadata]) => [id, metadata.label])) }
+		}
+
+		Object.assign(context, { levelLabels, moduleLabels: extensionModuleLabels, operationHint, operationLabels })
 	}
 })((globalThis.window || globalThis).OCA.Mcp.Admin)
 ;
@@ -6428,6 +6434,7 @@
 		 * @return {string}
 		 */
 		function moduleName(module) {
+			if (context.current?.extensions?.[module]) return context.current.extensions[module].label
 			return { files: t('mcp', 'Files'), notes: t('mcp', 'Notes'), deck: t('mcp', 'Deck'), calendar: t('mcp', 'Calendar'), contacts: t('mcp', 'Contacts'), tasks: t('mcp', 'Tasks'), talk: t('mcp', 'Talk'), people: t('mcp', 'People'), logs: t('mcp', 'Server log'), mail: t('mcp', 'Mail'), tables: t('mcp', 'Tables'), forms: t('mcp', 'Forms'), polls: t('mcp', 'Polls'), collectives: t('mcp', 'Collectives') }[module] || module
 		}
 
@@ -6798,7 +6805,7 @@
 		 */
 		function defaultLevel(module) {
 			const operations = context.current.catalog[module]
-			return window.OCA.Mcp.Admin.levels.levelOf(module, operations, Object.fromEntries(operations.map((operation) => [operation, operation === 'read' && module !== 'logs'])))
+			return window.OCA.Mcp.Admin.levels.levelOf(module, operations, Object.fromEntries(operations.map((operation) => [operation, operation === 'read' && module !== 'logs' && !context.current.extensions?.[module]])))
 		}
 		/** For a group the lowest level is "Not granted": the members keep what they have from elsewhere.
 		 * @param {string} level permission level ID
@@ -8305,6 +8312,7 @@
 		 * @return {string}
 		 */
 		function moduleName(module) {
+			if (context.shown?.extensions?.[module]) return context.shown.extensions[module].label
 			return { files: t('mcp', 'Files'), notes: t('mcp', 'Notes'), deck: t('mcp', 'Deck'), calendar: t('mcp', 'Calendar'), contacts: t('mcp', 'Contacts'), tasks: t('mcp', 'Tasks'), talk: t('mcp', 'Talk'), people: t('mcp', 'People'), logs: t('mcp', 'Server log'), mail: t('mcp', 'Mail'), tables: t('mcp', 'Tables'), forms: t('mcp', 'Forms'), polls: t('mcp', 'Polls'), collectives: t('mcp', 'Collectives') }[module] || module
 		}
 

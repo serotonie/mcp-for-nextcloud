@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 MCP extension fork contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Fork - Upstream automation tests
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  automation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: python3 scripts/test_upstream.py

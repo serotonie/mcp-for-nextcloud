@@ -68,7 +68,7 @@ final class ToolAccess {
 			return false;
 		}
 		// A guest reaches a module only when Guests allows the app behind it, and the tool's own app when it names one.
-		if ($this->guests !== null && (!$this->guests->allowsApp($userId, GrantMatrix::MODULE_APPS[$definition['module']] ?? '')
+		if ($this->guests !== null && (!$this->guests->allowsApp($userId, GrantMatrix::moduleApps()[$definition['module']] ?? '')
 			|| !$this->guests->allowsApp($userId, $definition['app'] ?? ''))) {
 			return false;
 		}

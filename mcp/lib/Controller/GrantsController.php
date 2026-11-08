@@ -572,10 +572,10 @@ class GrantsController extends Controller {
 	}
 
 	/**
-	 * @param mixed $module module id from the request body, validated against \OCA\Mcp\Access\Grants\GrantCatalog::CATALOG
-	 * @param mixed $operation operation id from the request body, validated against \OCA\Mcp\Access\Grants\GrantCatalog::CATALOG
+	 * @param mixed $module module id from the request body, validated against \OCA\Mcp\Access\Grants\GrantCatalog::all()
+	 * @param mixed $operation operation id from the request body, validated against \OCA\Mcp\Access\Grants\GrantCatalog::all()
 	 * @return array{0:string, 1:string}
-	 * @throws InvalidArgumentException when the pair is not in \OCA\Mcp\Access\Grants\GrantCatalog::CATALOG
+	 * @throws InvalidArgumentException when the pair is not in \OCA\Mcp\Access\Grants\GrantCatalog::all()
 	 */
 	private static function grant(mixed $module, mixed $operation): array {
 		if (!is_string($module) || !is_string($operation) || !GrantPolicy::inCatalog($module, $operation)) {

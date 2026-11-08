@@ -89,7 +89,7 @@ class Application extends App implements IBootstrap {
 		// Modules of the 1.3.0 contract register their own services and capability probes.
 		ModuleRegistrations::register($context, self::MODULES);
 		$context->registerService(ToolRegistry::class, static fn (ContainerInterface $c): ToolRegistry => new ToolRegistry(
-			array_map(static fn (string $class) => $c->get($class), self::MODULES),
+			array_merge(array_map(static fn (string $class) => $c->get($class), self::MODULES), \OCA\Mcp\Extension\ExtensionRegistry::current()->modules()),
 			$c->get(GrantPolicy::class),
 			$c->get(IAppManager::class),
 			$c->get(IUserManager::class),
@@ -123,5 +123,16 @@ class Application extends App implements IBootstrap {
 
 	/** @param IBootContext $context unused; the app needs no boot-time work */
 	public function boot(IBootContext $context): void {
+		$context->injectFn(static function (\OCP\EventDispatcher\IEventDispatcher $dispatcher, LoggerInterface $logger): void {
+			\OCA\Mcp\Extension\ExtensionRegistry::configure(static function (\OCA\Mcp\Extension\RegistrationEvent $event) use ($dispatcher, $logger): void {
+				try {
+					$dispatcher->dispatchTyped($event);
+				} catch (\Throwable $error) {
+					$logger->error('MCP extension registration failed', ['app' => 'mcp', 'exception' => $error]);
+					throw $error;
+				}
+			});
+			\OCA\Mcp\Access\Grants\ExtensionCatalog::configure(static fn (): array => \OCA\Mcp\Extension\ExtensionRegistry::current()->metadata());
+		});
 	}
 }

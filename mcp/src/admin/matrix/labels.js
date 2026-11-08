@@ -69,6 +69,8 @@
 		 * @return {string} description
 		 */
 		function operationHint(module, operation) {
+			const extension = context.state.data?.extensions?.[module]
+			if (extension) return extension.operations[operation] + ' (' + t('mcp', 'None') + ')'
 			if (module === 'talk' && operation === 'create') {
 				return t('mcp', 'Open new conversations, which invites people')
 			}
@@ -131,6 +133,10 @@
 			}
 		}
 
-		Object.assign(context, { levelLabels, moduleLabels, operationHint, operationLabels })
+		function extensionModuleLabels() {
+			return { ...moduleLabels(), ...Object.fromEntries(Object.entries(context.state.data?.extensions || {}).map(([id, metadata]) => [id, metadata.label])) }
+		}
+
+		Object.assign(context, { levelLabels, moduleLabels: extensionModuleLabels, operationHint, operationLabels })
 	}
 })((globalThis.window || globalThis).OCA.Mcp.Admin)

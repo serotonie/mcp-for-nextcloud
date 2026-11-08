@@ -37,7 +37,7 @@
 		 */
 		function defaultLevel(module) {
 			const operations = context.current.catalog[module]
-			return window.OCA.Mcp.Admin.levels.levelOf(module, operations, Object.fromEntries(operations.map((operation) => [operation, operation === 'read' && module !== 'logs'])))
+			return window.OCA.Mcp.Admin.levels.levelOf(module, operations, Object.fromEntries(operations.map((operation) => [operation, operation === 'read' && module !== 'logs' && !context.current.extensions?.[module]])))
 		}
 		/** For a group the lowest level is "Not granted": the members keep what they have from elsewhere.
 		 * @param {string} level permission level ID

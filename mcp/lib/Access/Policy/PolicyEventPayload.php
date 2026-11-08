@@ -284,7 +284,7 @@ final class PolicyEventPayload {
 		if ($key === GrantPolicy::ELIGIBLE_KEY) {
 			return true;
 		}
-		foreach (\OCA\Mcp\Access\Grants\GrantCatalog::CATALOG as $module => $operations) {
+		foreach (\OCA\Mcp\Access\Grants\GrantCatalog::all() as $module => $operations) {
 			foreach ($operations as $operation) {
 				if ($key === 'grant_' . $module . '_' . $operation) {
 					return true;

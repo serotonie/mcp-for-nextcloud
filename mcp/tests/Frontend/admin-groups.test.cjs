@@ -91,6 +91,24 @@ async function app(handler, group = stored()) {
 }
 const preview = { previewId: 'receipt', revision: '9007199254740993', members: 51, revokes: 2, withdraws: true }
 
+test('extension labels and default denial preserve independent operation controls', async () => {
+	const ui = await app(undefined, stored({
+		catalog: { _system: ['eligible'], acme: ['read', 'create', 'edit', 'delete'] },
+		extensions: { acme: { label: 'Acme extension', operations: { read: 'Read', create: 'Create', edit: 'Edit', delete: 'Delete' }, defaultGranted: false } },
+	}))
+	await ui.open()
+	assert.match(ui.ids['mcp-group-detail'].textContent, /Acme extension/)
+	assert.match(ui.ids['mcp-group-detail'].textContent, /Default: None/)
+	assert.doesNotMatch(ui.ids['mcp-group-detail'].textContent, /Default: Read/)
+	ui.operations()
+	for (const operation of ['read', 'create', 'edit', 'delete']) assert.ok(ui.input('mcp-group-op-acme', operation))
+	ui.check(ui.input('mcp-group-op-acme', 'create'))
+	assert.equal(ui.input('mcp-group-op-acme', 'create').checked, true)
+	assert.equal(ui.input('mcp-group-op-acme', 'read').checked, false)
+	assert.equal(ui.input('mcp-group-op-acme', 'edit').checked, false)
+	assert.equal(ui.input('mcp-group-op-acme', 'delete').checked, false)
+})
+
 test('T17: unknown counters stay distinct from zero and the heading receives focus', async () => {
 	const ui = await app()
 	await ui.open()

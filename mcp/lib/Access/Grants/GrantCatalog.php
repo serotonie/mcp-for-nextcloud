@@ -50,4 +50,8 @@ final class GrantCatalog {
 	/** Prevents instantiation of the immutable catalog. */
 	private function __construct() {
 	}
+
+	public static function all(): array {
+		return self::CATALOG + ExtensionCatalog::operations();
+	}
 }

@@ -1,6 +1,11 @@
 version = 1
 
 [[annotations]]
+path = ["fork-base.json", "docs/fork/*.md", "mcp/lib/Extension/*.php", "mcp/tests/Unit/Extension/*.php"]
+SPDX-FileCopyrightText = "2026 MCP extension fork contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
 path = [
   ".gitignore",
   "CHANGELOG.md",

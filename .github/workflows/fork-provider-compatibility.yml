@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 MCP extension fork contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Fork - Fuelin provider compatibility
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fuelin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Require provider and pinned Nextcloud image
+        env:
+          PROVIDER: ${{ vars.FUELIN_REPOSITORY }}
+          TEST_IMAGE: ${{ vars.FUELIN_TEST_IMAGE }}
+          PROVIDER_TOKEN: ${{ secrets.FUELIN_CI_TOKEN }}
+        run: |
+          test -n "$PROVIDER" && test -n "$PROVIDER_TOKEN" || {
+            echo 'Private Nextcloud Fuelin app repository and read-only token are required.' >&2
+            exit 1
+          }
+          printf '%s' "$TEST_IMAGE" | grep -Eq '^[a-zA-Z0-9./:_-]+@sha256:[a-f0-9]{64}$' || {
+            echo 'FUELIN_TEST_IMAGE must be digest-pinned and provide Nextcloud 35 in /usr/src/nextcloud.' >&2
+            exit 1
+          }
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: fork
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: ${{ vars.FUELIN_REPOSITORY }}
+          token: ${{ secrets.FUELIN_CI_TOKEN }}
+          path: fuelin
+          persist-credentials: false
+      - name: Run actual provider registration and all 15 tool tests offline
+        env:
+          TEST_IMAGE: ${{ vars.FUELIN_TEST_IMAGE }}
+        run: |
+          docker pull "$TEST_IMAGE"
+          docker run --rm --network none --read-only --tmpfs /tmp \
+            -e NEXTCLOUD_ROOT=/usr/src/nextcloud -e MCP_APP_ROOT=/mcp \
+            -v "$PWD/fork/mcp:/mcp:ro" -v "$PWD/fuelin:/fuelin:ro" \
+            --entrypoint php "$TEST_IMAGE" /fuelin/tests/run.php
+          docker run --rm --network none --read-only --tmpfs /tmp \
+            -e NEXTCLOUD_ROOT=/usr/src/nextcloud -v "$PWD/fuelin:/fuelin:ro" \
+            --entrypoint php "$TEST_IMAGE" /fuelin/tests/bootstrap.php
