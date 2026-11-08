@@ -368,7 +368,7 @@ class GrantPolicy implements ScopeReader {
 	 * @return bool the default grant
 	 */
 	public static function defaultGranted(string $module, string $operation): bool {
-		return $operation === 'read' && !in_array($module, self::DENIED_READS, true);
+		return isset(GrantCatalog::CATALOG[$module]) && $operation === 'read' && !in_array($module, self::DENIED_READS, true);
 	}
 
 	/**
@@ -405,7 +405,7 @@ class GrantPolicy implements ScopeReader {
 				$eligibility = $context->eligible();
 				$state = ['eligible' => $eligibility->allowed, 'connected' => $context->connected(), 'grants' => [],
 					'origins' => ['eligible' => ['source' => $eligibility->source, 'groupIds' => $eligibility->groupIds], 'grants' => []]];
-				foreach (GrantCatalog::CATALOG as $module => $operations) {
+				foreach (GrantCatalog::all() as $module => $operations) {
 					foreach ($operations as $operation) {
 						$grant = $context->granted($module, $operation);
 						$state['grants'][$module][$operation] = $grant->allowed;
@@ -428,7 +428,7 @@ class GrantPolicy implements ScopeReader {
 	 * @return bool whether the pair exists in CATALOG
 	 */
 	public static function inCatalog(string $module, string $operation): bool {
-		return isset(GrantCatalog::CATALOG[$module]) && in_array($operation, GrantCatalog::CATALOG[$module], true);
+		return isset(GrantCatalog::all()[$module]) && in_array($operation, GrantCatalog::all()[$module], true);
 	}
 
 	/**

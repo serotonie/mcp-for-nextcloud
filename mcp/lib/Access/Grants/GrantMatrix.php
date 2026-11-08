@@ -34,12 +34,16 @@ class GrantMatrix {
 	/** Matrix filters: '' every user, 'eligible' the eligible ones, 'connected' the eligible ones who also connected. */
 	public const FILTERS = ['' => null, 'eligible' => GrantPolicy::ELIGIBLE_KEY, 'connected' => GrantPolicy::CONNECTED_KEY];
 	/**
-	 * Nextcloud app that provides each module of GrantCatalog::CATALOG; '' for a module of the core. The logs column
+	 * Nextcloud app that provides each module of GrantCatalog::all(); '' for a module of the core. The logs column
 	 * follows {@see LogsAccess} instead: offered while the log is a file, and open only to the users of its role.
 	 */
 	public const MODULE_APPS = ['files' => 'files', 'notes' => 'notes', 'deck' => 'deck', 'calendar' => 'calendar', 'talk' => 'spreed', 'contacts' => 'contacts', 'tasks' => 'dav', 'people' => '', 'logs' => '', 'mail' => 'mail', 'tables' => 'tables', 'forms' => 'forms', 'polls' => 'polls', 'collectives' => 'collectives'];
 	/** Module whose column follows the role gate of {@see LogsAccess}. */
 	private const LOGS = 'logs';
+
+	public static function moduleApps(): array {
+		return self::MODULE_APPS + ExtensionCatalog::apps();
+	}
 
 	public function __construct(
 		private GrantPolicy $policy,
@@ -72,7 +76,7 @@ class GrantMatrix {
 		$hasMore = count($users) > self::PAGE_SIZE;
 		$users = array_slice($users, 0, self::PAGE_SIZE);
 		$appsEnabled = $this->appsEnabled();
-		$catalog = array_filter(GrantCatalog::CATALOG, static fn (string $module) => $appsEnabled[$module], ARRAY_FILTER_USE_KEY);
+		$catalog = array_filter(GrantCatalog::all(), static fn (string $module) => $appsEnabled[$module], ARRAY_FILTER_USE_KEY);
 		return [
 			'users' => $this->rows($users),
 			'page' => $page,
@@ -80,6 +84,7 @@ class GrantMatrix {
 			'hasMore' => $hasMore,
 			'total' => $total,
 			'catalog' => $catalog,
+			'extensions' => ExtensionCatalog::metadata(),
 			'appsEnabled' => $appsEnabled,
 			'groups' => $this->groups(),
 			'serviceEnabled' => $this->policy->globalEnabled(),
@@ -95,7 +100,7 @@ class GrantMatrix {
 		$scopes = $this->scopes($users);
 		return array_map(function (IUser $user) use ($state, $scopes): array {
 			$appsEnabled = [];
-			foreach (self::MODULE_APPS as $module => $app) {
+			foreach (self::moduleApps() as $module => $app) {
 				$appsEnabled[$module] = $module === self::LOGS
 					? $this->logs->permits($user->getUID())
 					: $app === 'files' || $app === '' || AppEnablement::forUser($this->appManager, $app, $user);
@@ -144,7 +149,7 @@ class GrantMatrix {
 
 	/** @return array<string, bool> whether each module's app is enabled for anyone on the server, and the log is a file */
 	public function appsEnabled(): array {
-		$enabled = array_map(fn (string $app) => $app === 'files' || $app === '' || AppEnablement::forAnyone($this->appManager, $app), self::MODULE_APPS);
+		$enabled = array_map(fn (string $app) => $app === 'files' || $app === '' || AppEnablement::forAnyone($this->appManager, $app), self::moduleApps());
 		$enabled[self::LOGS] = $this->logs->available();
 		return $enabled;
 	}

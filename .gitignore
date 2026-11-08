@@ -65,6 +65,9 @@ docs/
 !/docs/en/adding-a-module.md
 !/docs/en/testing.md
 !/docs/en/packaging.md
+!/docs/fork/
+!/docs/fork/*.md
+/scripts/__pycache__/
 .claude/
 .superpowers/
 .remember/

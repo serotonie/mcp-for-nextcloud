@@ -53,6 +53,15 @@ class ToolRegistry {
 		private ?GuestRestrictions $guests = null,
 		?CapabilityRegistry $capabilities = null,
 	) {
+		$names = [\OCA\Mcp\Mcp\Guide\ToolGuide::TOOL => true];
+		foreach ($modules as $module) {
+			foreach ($module->definitions() as $definition) {
+				if (isset($names[$definition['name']])) {
+					throw new \LogicException('Duplicate MCP tool name: ' . $definition['name']);
+				}
+				$names[$definition['name']] = true;
+			}
+		}
 		$this->access = new ToolAccess($policy, $appManager, $userManager, $guests, $capabilities ?? new CapabilityRegistry([], $logger));
 	}
 
@@ -252,12 +261,16 @@ class ToolRegistry {
 	 */
 	private function present(array $definition): array {
 		$definition = WriteGate::publish($definition);
+		$annotations = ToolPresentation::annotations($definition['name'], $definition['operation'], ($definition['destructiveHint'] ?? false) === true);
+		if (($definition['openWorldHint'] ?? false) === true) {
+			$annotations['openWorldHint'] = true;
+		}
 		return [
 			'name' => $definition['name'],
 			'title' => ToolPresentation::title($definition['name']),
 			'description' => $definition['description'],
 			'inputSchema' => $definition['inputSchema'],
-			'annotations' => ToolPresentation::annotations($definition['name'], $definition['operation'], ($definition['destructiveHint'] ?? false) === true),
+			'annotations' => $annotations,
 			'module' => $definition['module'],
 			'operation' => $definition['operation'],
 		] + (isset($definition['app']) ? ['app' => $definition['app']] : [])

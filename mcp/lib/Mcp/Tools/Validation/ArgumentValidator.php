@@ -166,6 +166,11 @@ final class ArgumentValidator {
 			'integer' => is_int($value)
 				&& (!isset($rule['minimum']) || $value >= $rule['minimum'])
 				&& (!isset($rule['maximum']) || $value <= $rule['maximum']),
+			'number' => (is_int($value) || is_float($value)) && is_finite((float)$value)
+				&& (!isset($rule['minimum']) || $value >= $rule['minimum'])
+				&& (!isset($rule['exclusiveMinimum']) || $value > $rule['exclusiveMinimum'])
+				&& (!isset($rule['maximum']) || $value <= $rule['maximum'])
+				&& (!isset($rule['exclusiveMaximum']) || $value < $rule['exclusiveMaximum']),
 			'boolean' => is_bool($value),
 			default => false,
 		};
@@ -180,11 +185,13 @@ final class ArgumentValidator {
 		$type = $rule['type'] ?? [];
 		$types = is_array($type) ? $type : [$type];
 		$parts = [Translator::t('expected %s', [implode(' or ', $types)])];
-		foreach (['minimum', 'maximum', 'minLength', 'maxLength', 'minItems', 'maxItems'] as $bound) {
+		foreach (['minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'minLength', 'maxLength', 'minItems', 'maxItems'] as $bound) {
 			if (isset($rule[$bound])) {
 				$parts[] = match ($bound) {
 					'minimum' => Translator::t('minimum %s', [$rule[$bound]]),
 					'maximum' => Translator::t('maximum %s', [$rule[$bound]]),
+					'exclusiveMinimum' => Translator::t('greater than %s', [$rule[$bound]]),
+					'exclusiveMaximum' => Translator::t('less than %s', [$rule[$bound]]),
 					'minLength' => Translator::t('minimum length %s', [$rule[$bound]]),
 					'maxLength' => Translator::t('maximum length %s', [$rule[$bound]]),
 					'minItems' => Translator::t('minimum items %s', [$rule[$bound]]),

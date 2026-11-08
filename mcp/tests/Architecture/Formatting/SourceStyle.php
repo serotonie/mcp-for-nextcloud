@@ -15,6 +15,8 @@ final class SourceStyle {
 		// REUSE-IgnoreStart
 		foreach (['SPDX-FileCopyrightText: 2026 Sintax (Jhonatan Jaworski) <contato@sintax.tech>', 'SPDX-License-Identifier: AGPL-3.0-or-later'] as $header) {
 		// REUSE-IgnoreEnd
+			// Fork-authored sources retain their own explicit attribution.
+			if (str_starts_with($header, 'SPDX-FileCopyrightText:') && str_contains(substr($source, 0, 500), 'SPDX-FileCopyrightText: 2026 MCP extension fork contributors')) { continue; }
 			if (!str_contains(substr($source, 0, 500), $header)) { $issues['header:' . $header] = 1; }
 		}
 		$php = str_ends_with($path, '.php');

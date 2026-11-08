@@ -283,6 +283,8 @@ OC.L10N.register(
     "expected %s" : "se esperaba %s",
     "minimum %s" : "mínimo %s",
     "maximum %s" : "máximo %s",
+    "greater than %s" : "mayor que %s",
+    "less than %s" : "menor que %s",
     "minimum length %s" : "longitud mínima %s",
     "maximum length %s" : "longitud máxima %s",
     "minimum items %s" : "mínimo de elementos %s",

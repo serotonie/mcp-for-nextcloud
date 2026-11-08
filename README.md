@@ -468,3 +468,9 @@ Developed by [Sintax](https://sintax.tech) · sintax.tech.
 - GitHub: https://github.com/sintax-tech
 - Contact: contato@sintax.tech
 - Other Nextcloud apps by Sintax: [MCP for Cloud](https://apps.nextcloud.com/apps/mcp) · [Audiolog](https://apps.nextcloud.com/apps/audiolog)
+# Extension-enabled fork (unreleased)
+
+This fork preserves upstream 1.3.2 and adds a generic API for separate Nextcloud
+apps. See [extension API](docs/fork/extension-api.md) and
+[upstream maintenance and publication](docs/fork/upstream-maintenance.md).
+Development sources are not a signed or production-approved distribution.

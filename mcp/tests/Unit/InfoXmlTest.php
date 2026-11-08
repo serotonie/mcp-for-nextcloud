@@ -94,7 +94,12 @@ final class InfoXmlTest extends TestCase {
 		$repository = 'https://github.com/sintax-tech/mcp-for-nextcloud';
 
 		$this->assertSame('mcp', (string)$manifest->id);
-		$this->assertSame(FinalStoreLocaleContract::VERSION, (string)$manifest->version);
+		$base = json_decode(file_get_contents(__DIR__ . '/../../../fork-base.json'), true, 512, JSON_THROW_ON_ERROR);
+		$this->assertSame('v' . FinalStoreLocaleContract::VERSION, $base['tag']);
+		[$major, $minor, $patch] = array_map('intval', explode('.', FinalStoreLocaleContract::VERSION));
+		$forkVersion = $major . '.' . $minor . '.' . ($patch + 1) . '-fork.' . $base['revision'];
+		$this->assertSame($forkVersion, (string)$manifest->version);
+		$this->assertTrue(version_compare($forkVersion, FinalStoreLocaleContract::VERSION, '>'));
 		$this->assertSame($repository, (string)$manifest->website);
 		$this->assertSame($repository . '/issues', (string)$manifest->bugs);
 		$this->assertSame($repository . '.git', (string)$manifest->repository);
