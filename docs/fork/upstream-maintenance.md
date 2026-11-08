@@ -19,6 +19,9 @@ Remaining deliberate changes to upstream files:
 - Generated admin bundle and class inventory/REUSE entries for the new classes.
 - Exact fork-author attribution accepted by the architecture style test, without
   removing the original attribution or accepting the existing invalid mutants.
+- App metadata identifies the manual fork as 1.3.3-fork.1, based on upstream 1.3.2,
+  so Nextcloud runs its normal upgrade path instead of treating changed code
+  as the same installed version.
 
 The integration-specific MCP patch is **not** applied to the fork. Review with
 `git diff upstream/main -- mcp/lib mcp/src` and inspect new files too.
@@ -78,11 +81,20 @@ branch/index; do not mistake a clean HEAD check for validation of working edits.
 
 Keep upstream `vX.Y.Z` tags intact. Fork tags are exclusively
 `fork/vX.Y.Z-rN`, where X.Y.Z is the integrated upstream release and N increments
-for fork changes. Use numeric Nextcloud app version `X.Y.Z.N` at approved fork
-publication (example `1.3.2.1`); API version remains separately `1`. Before every
-release verify Nextcloud's actual version ordering and upgrade path; if upstream
+for fork changes. Nextcloud 35's schema rejects four-component versions such as
+`1.3.2.1`. Use the next patch with a fork prerelease suffix: upstream `X.Y.Z`
+maps to app `X.Y.(Z+1)-fork.N` (example `1.3.3-fork.1` for upstream `1.3.2`).
+The metadata and fork tag record the integrated upstream identity; the app's
+patch reservation is not a claim to integrate upstream `1.3.3`.
+API version remains separately `1`. Before every release verify the app schema,
+Nextcloud's actual version ordering and the installed upgrade path; if upstream
 changes its scheme, stop and define a migration, not a downgrade. Development
-metadata currently retains upstream app version 1.3.2 and says `unreleased`.
+metadata currently uses app version 1.3.3-fork.1 and says `unreleased`; assigning an
+upgrade version does not publish a release or tag.
+The default App Store updater must not overwrite this manually managed fork:
+upstream `1.3.3` orders above `1.3.3-fork.1`. Keep app updates controlled, do not
+run an unfiltered `occ app:update --all`, and review the supported updater policy
+in staging before enabling any automatic update channel.
 
 Source commits and branches may be published without a Nextcloud certificate.
 According to the [Nextcloud signing documentation](https://docs.nextcloud.com/server/latest/developer_manual/app_publishing_maintenance/code_signing.html),
@@ -92,7 +104,7 @@ not universally required to be signed; its actual installation/update policy
 must be checked in staging, especially when retaining a previously signed app ID.
 
 Only after approved PR merge, green required checks, provider compatibility and
-the chosen distribution's integrity prerequisites: update/verify numeric app version and provenance in the PR,
+the chosen distribution's integrity prerequisites: update/verify app version and provenance in the PR,
 tag the merged base commit, build with upstream packaging tooling, sign using an
 authorized Nextcloud app certificate, verify installation integrity in staging,
 then publish the approved artifacts plus hashes/source/provenance. Never move a
