@@ -54,6 +54,9 @@ The Fuelin compatibility workflow needs a private **Nextcloud Fuelin app** repo
 (not the TypeScript `fuelin-mcp` server), its read-only checkout token and a
 digest-pinned Nextcloud 35 test image. Until these prerequisites exist, its
 explicit failure blocks an update; local passing tests are not GitHub checks.
+Set `FUELIN_REF` to the full reviewed provider commit SHA; CI must test the
+intended paired versions, not a moving default branch. Update that pin through
+the same review and provider compatibility process when Fuelin changes.
 
 ## Conflict resolution
 
