@@ -196,7 +196,11 @@ final class DeckCutPresentationTest extends TestCase {
 		self::assertStringContainsString('só quando o vínculo é criado', $portuguese);
 		self::assertStringContainsString('não revoga o vínculo depois', $portuguese);
 		$info = (string)file_get_contents($repo . '/mcp/appinfo/info.xml');
-		self::assertStringContainsString('<version>' . FinalStoreLocaleContract::VERSION . '</version>', $info);
+		$base = json_decode(file_get_contents($repo . '/fork-base.json'), true, 512, JSON_THROW_ON_ERROR);
+		self::assertSame('v' . FinalStoreLocaleContract::VERSION, $base['tag']);
+		[$major, $minor, $patch] = array_map('intval', explode('.', FinalStoreLocaleContract::VERSION));
+		self::assertStringContainsString('<version>' . $major . '.' . $minor . '.' . ($patch + 1)
+			. '-fork.' . $base['revision'] . '</version>', $info);
 		$unlinkGuarantees = [
 			'en' => 'Unlinking a Deck file association never deletes the original file.',
 			'pt-br' => 'Desvincular um arquivo do Deck nunca apaga o arquivo original.',
