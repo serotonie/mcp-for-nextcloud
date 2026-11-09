@@ -3,14 +3,10 @@
     xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>mcp</id>
     <name>MCP for Cloud</name>
-    <summary>MCP server for your Nextcloud: connect Claude, ChatGPT and other AI clients, with
-        per-user and per-group permissions</summary>
-    <summary lang="pt-br">Servidor MCP para o seu Nextcloud: conecte o Claude, o ChatGPT e outros
-        clientes de IA, com permissões por usuário e por grupo</summary>
-    <summary lang="es">Servidor MCP para su Nextcloud: conecte Claude, ChatGPT y otros clientes de
-        IA, con permisos por usuario y por grupo</summary>
-    <summary lang="de">MCP-Server für Nextcloud: KI-Clients mit Berechtigungen pro Benutzer und
-        Gruppe verbinden</summary>
+    <summary>MCP server for your Nextcloud: connect Claude, ChatGPT and other AI clients, with per-user and per-group permissions</summary>
+    <summary lang="pt-br">Servidor MCP para o seu Nextcloud: conecte o Claude, o ChatGPT e outros clientes de IA, com permissões por usuário e por grupo</summary>
+    <summary lang="es">Servidor MCP para su Nextcloud: conecte Claude, ChatGPT y otros clientes de IA, con permisos por usuario y por grupo</summary>
+    <summary lang="de">MCP-Server für Nextcloud: KI-Clients mit Berechtigungen pro Benutzer und Gruppe verbinden</summary>
     <description><![CDATA[
 ## What's new in 1.3.3, 1.3.2, 1.3.1 and 1.3.0
 
@@ -328,10 +324,8 @@ Nextcloud 32–35, PHP 8.2+. Mail 5.0.0+ (Anhangtext 5.10.11+), Tables 1.0.0+, F
     <website>https://github.com/sintax-tech/mcp-for-nextcloud</website>
     <bugs>https://github.com/sintax-tech/mcp-for-nextcloud/issues</bugs>
     <repository type="git">https://github.com/sintax-tech/mcp-for-nextcloud.git</repository>
-    <screenshot>
-        https://raw.githubusercontent.com/sintax-tech/mcp-for-nextcloud/main/screenshots/admin.png</screenshot>
-    <screenshot>
-        https://raw.githubusercontent.com/sintax-tech/mcp-for-nextcloud/main/screenshots/plan.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/sintax-tech/mcp-for-nextcloud/main/screenshots/admin.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/sintax-tech/mcp-for-nextcloud/main/screenshots/plan.png</screenshot>
     <dependencies>
         <php min-version="8.2" />
         <nextcloud min-version="32" max-version="35" />

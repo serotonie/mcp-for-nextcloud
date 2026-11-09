@@ -2,6 +2,11 @@
 
 ## Baseline and divergences
 
+The current candidate is app version `1.3.4-fork.1`, integrating upstream
+`v1.3.3` at `b05bc78002fc0e7fa851d9fc6123b575c4a3c2ad`. `fork-base.json`
+records that release. It remains unpublished until explicitly released.
+The inspection and preparation notes below describe the initial v1.3.2 baseline.
+
 Inspection on 2026-11-08 found latest stable upstream `v1.3.2` and branch `main`
 at `534b981c97be6541d97338c1c9a82f1aa9c2e559`. The annotated release tag resolves
 to the same commit. `fork-base.json` records this identity; upstream was not
@@ -89,7 +94,7 @@ patch reservation is not a claim to integrate upstream `1.3.3`.
 API version remains separately `1`. Before every release verify the app schema,
 Nextcloud's actual version ordering and the installed upgrade path; if upstream
 changes its scheme, stop and define a migration, not a downgrade. Development
-metadata currently uses app version 1.3.3-fork.1 and says `unreleased`; assigning an
+metadata currently uses app version 1.3.4-fork.1 and says `unreleased`; assigning an
 upgrade version does not publish a release or tag.
 The default App Store updater must not overwrite this manually managed fork:
 upstream `1.3.3` orders above `1.3.3-fork.1`. Keep app updates controlled, do not
