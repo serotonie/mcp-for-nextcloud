@@ -50,9 +50,21 @@ final class SchemaBuilder {
 	 * @return array{content: list<array{type:string, text:string}>} MCP result
 	 */
 	public static function result(mixed ...$blocks): array {
+		return self::encodeBlocks(JSON_PRETTY_PRINT, $blocks);
+	}
+
+	/**
+	 * @return array{content: list<array{type:string, text:string}>}
+	 */
+	public static function compactResult(mixed ...$blocks): array {
+		return self::encodeBlocks(0, $blocks);
+	}
+
+	/** @return array{content: list<array{type:string, text:string}>} */
+	private static function encodeBlocks(int $flags, array $blocks): array {
 		$content = [];
 		foreach ($blocks as $block) {
-			$content[] = ['type' => 'text', 'text' => json_encode($block, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR)];
+			$content[] = ['type' => 'text', 'text' => json_encode($block, $flags | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR)];
 		}
 		return ['content' => $content];
 	}
