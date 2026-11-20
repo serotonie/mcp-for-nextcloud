@@ -31,6 +31,7 @@ use OCA\Mcp\Modules\Files\Reorganization\Reorganization;
 use OCA\Mcp\Modules\Files\Presentation\FilesMessages;
 use OCA\Mcp\Modules\Files\FilesModule;
 use OCA\Mcp\Modules\Files\Images\OcrSupport;
+use OCA\Mcp\Modules\Files\Extraction\FileReadLimit;
 use OCA\Mcp\Modules\Files\Extraction\TextExtractor;
 use OCA\Mcp\Modules\Files\Integration\VersionRestore;
 use OCA\Mcp\Modules\Files\Integration\VersionTools;
@@ -80,7 +81,7 @@ final class FilesModuleTest extends TestCase {
 		$access = new NodeAccessInfo(FakeUsers::manager($this, FakeUsers::DEFAULTS), $this->tree->shareManager());
 		$urls = $this->createMock(IURLGenerator::class);
 		$urls->method('linkToRouteAbsolute')->willReturnCallback(fn (string $route, array $args = []) => 'https://cloud.test/apps/mcp/' . ($args['token'] ?? ''));
-		$extractor = new TextExtractor($temp);
+		$extractor = new TextExtractor($temp, new FileReadLimit($appConfig));
 		$gate = AbsentFileTypePolicy::gate($this);
 		$shared = new SharedWriteGuard($access);
 		$commit = new ContentCommit($gate, $access);
@@ -144,10 +145,16 @@ final class FilesModuleTest extends TestCase {
 			'files_move_batch', 'files_undo_batch', 'files_read', 'files_edit', 'files_replace',
 			'files_checkout', 'files_versions_list', 'files_version_read', 'files_version_restore',
 			'files_image_view', 'files_images_view', 'files_image_search', 'files_list_shares', 'files_share', 'files_unshare',
-			'files_upload', 'files_create', 'files_delete'],
+			'files_upload', 'files_create', 'files_delete', 'files_list_tags', 'files_read_comments', 'files_set_tag', 'files_add_comment'],
 			array_keys($defs));
 		$this->assertSame(['read', 'read', 'read', 'create', 'create', 'move', 'move', 'move', 'read', 'edit',
-			'edit', 'edit', 'read', 'read', 'restore', 'read', 'read', 'read', 'read', 'share', 'share', 'create', 'create', 'delete'], array_column($defs, 'operation'));
+			'edit', 'edit', 'read', 'read', 'restore', 'read', 'read', 'read', 'read', 'share', 'share', 'create', 'create', 'delete', 'read', 'read', 'tags', 'comments'], array_column($defs, 'operation'));
+		$this->assertTrue($defs['files_set_tag']['destructiveHint'] ?? false, 'a tag relation change is published as destructive (plan, phase 5)');
+		$this->assertSame(['readOnlyHint' => false, 'destructiveHint' => true], array_intersect_key(
+			\OCA\Mcp\Mcp\Tools\ToolPresentation::annotations('files_set_tag', 'tags', true), ['readOnlyHint' => 0, 'destructiveHint' => 0]));
+		$this->assertTrue($defs['files_add_comment']['destructiveHint'] ?? false, 'a new comment is published as destructive (plan, phase 5)');
+		$this->assertSame(['readOnlyHint' => false, 'destructiveHint' => true], array_intersect_key(
+			\OCA\Mcp\Mcp\Tools\ToolPresentation::annotations('files_add_comment', 'comments', true), ['readOnlyHint' => 0, 'destructiveHint' => 0]));
 		$this->assertSame(['files_versions', 'files_versions', 'files_versions'],
 			array_values(array_filter(array_column($defs, 'app', 'name'))));
 		$this->assertArrayNotHasKey('app', $defs['files_tree'], 'a árvore só depende de arquivos, que sempre existem');
