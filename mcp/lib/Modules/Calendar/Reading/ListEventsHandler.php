@@ -80,14 +80,14 @@ final class ListEventsHandler implements CalendarEventListing {
 						continue;
 					}
 					if (count($items) >= self::MAX_ITEMS) {
-						return SchemaBuilder::result($items, ['truncated' => true, 'limit' => self::MAX_ITEMS]);
+						return SchemaBuilder::compactResult($items, ['truncated' => true, 'limit' => self::MAX_ITEMS]);
 					}
 					$items[] = $this->mapper->toItem($occurrence['event'], $occurrence['start'], $occurrence['end'], $calendar, $visibility)
 						+ EventAlarmListing::fields($occurrence['event'], $visibility, $calendar, $userId);
 				}
 			}
 		}
-		return SchemaBuilder::result($items);
+		return SchemaBuilder::compactResult($items);
 	}
 
 	/**

@@ -387,7 +387,7 @@ A module or tool the user cannot see is refused with a message that lists what t
 | `notes_delete` `{id, etag?}` | notes.delete | Requires `confirm: true`, the trash bin (`files_trashbin`) active and the note's storage covered by it; on external storage without a trash bin, deletion is blocked. |
 
 | `calendar_list_calendars` `{}` | calendar.read | Calendars visible to the user, own and shared. |
-| `calendar_list_events` `{calendar?, from?, to?}` | calendar.read | Events in the range (default: next 7 days), with recurrence expanded. |
+| `calendar_list_events` `{calendar?, from?, to?}` | calendar.read | Events in the range (default: next 7 days), with recurrence expanded, as compact JSON. |
 
 Calendar exposes reading and the five writes, with no terminal step. The writes start off in the admin matrix (Administration → MCP) and only appear for those who received the grant; every write also requires `confirm: true`, the Nextcloud ACL (and `confirm_shared` on someone else's calendar) and the optional ETag. Compatibility: the app declares `min-version` 32 and `max-version` 35 in `info.xml`; the internal part (the core's `EmbeddedCalDavServer`) is covered by the tests and by that range, and a new Nextcloud version requires a new version of the app. The Calendar app must be enabled for the user. Sabre and Symfony Console come from the Nextcloud core and stay out of the package's `vendor/`.
 
