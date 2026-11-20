@@ -1,8 +1,8 @@
 {
   "upstream": "sintax-tech/mcp-for-nextcloud",
   "branch": "main",
-  "tag": "v1.3.3",
-  "commit": "b05bc78002fc0e7fa851d9fc6123b575c4a3c2ad",
+  "tag": "v1.4.0",
+  "commit": "b3220e96c4f0674d323f99c7c75eedd2fc47cdfa",
   "extensionApi": 1,
   "revision": 1,
   "publication": "unreleased"
