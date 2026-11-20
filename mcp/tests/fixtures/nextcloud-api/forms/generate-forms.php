@@ -6,7 +6,7 @@
 declare(strict_types=1);
 
 /**
- * Generates four signature/behavior contracts from SHA-checked official archives and merges the floor into aggregate
+ * Generates exact-pin signature/behavior contracts from SHA-checked official archives and merges the floor into aggregate
  * fixtures. Source is parsed, never executed. Run only in a pinned PHP container: php generate-forms.php <pins> <archives>.
  */
 use OCA\Mcp\Tests\Unit\Contract\NextcloudApi\SourceParser;
@@ -25,9 +25,9 @@ foreach (FormsSourcePins::all() as $version => $sha) {
 	try {
 		(new PharData($archive))->extractTo($tree . '/apps');
 		mkdir($tree . '/lib/public/AppFramework/Db', 0777, true);
-		$nativePins = json_decode(file_get_contents(dirname(__DIR__) . '/tables/tables-sources.json'), true)['32']['server']['files'];
+		$nativePins = json_decode(file_get_contents(dirname(__DIR__) . '/tables/tables-sources.json'), true)['34']['server']['files'];
 		foreach ($nativePins as $path => $expected) {
-			$source = "$archives/server-32.0.0-" . basename($path);
+			$source = "$archives/server-34.0.0-" . basename($path);
 			if (hash_file('sha256', $source) !== $expected) { throw new RuntimeException('Server signature SHA mismatch'); }
 			copy($source, "$tree/$path");
 		}
@@ -46,7 +46,7 @@ foreach (FormsSourcePins::all() as $version => $sha) {
 		rmdir($tree);
 	}
 }
-foreach (range(31, 35) as $major) {
+foreach ([34, 35] as $major) {
 	$file = dirname(__DIR__) . "/$major.php";
 	$fixture = require $file;
 	foreach ($floor as $class => $surface) { $fixture['classes'][$class] = $surface; }
@@ -55,4 +55,4 @@ foreach (range(31, 35) as $major) {
 	$before = file_get_contents($file);
 	FixtureFile::write($file, substr($before, 0, strpos($before, 'return [')), $fixture);
 }
-echo "Generated four verified Forms contracts and aggregate signature surfaces\n";
+echo "Generated " . count(FormsSourcePins::all()) . " verified Forms contracts and aggregate signature surfaces\n";
