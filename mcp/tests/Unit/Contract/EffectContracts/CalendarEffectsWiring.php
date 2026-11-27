@@ -145,7 +145,7 @@ final class CalendarEffectsWiring {
 			$logger,
 			$zones,
 		);
-		$create = new CreateEventDraft($access, $guard, $dav, $store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time);
+		$create = new CreateEventDraft($access, $guard, $dav, $store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time, $config);
 		$approval = new CalendarDraftApproval($scheduling, $builder, $guard, $warnings, $zones);
 		return ['access' => $access, 'repository' => $repository, 'classification' => $classification, 'mapper' => $mapper, 'dates' => $dates,
 			'time' => $time, 'logger' => $logger, 'guard' => $guard, 'builder' => $builder, 'attendees' => $attendees, 'scheduling' => $scheduling,

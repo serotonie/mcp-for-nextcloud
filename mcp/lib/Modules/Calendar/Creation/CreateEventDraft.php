@@ -22,6 +22,7 @@ use OCA\Mcp\Modules\Calendar\Locating\EventRepository;
 use OCA\Mcp\Modules\Calendar\Scheduling\Scheduling;
 use OCA\Mcp\Modules\Calendar\Approval\SharedGuard;
 use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\IConfig;
 use OCA\Mcp\Mcp\Tools\Schema\SchemaBuilder;
 
 /**
@@ -44,6 +45,7 @@ final class CreateEventDraft implements \OCA\Mcp\Modules\Calendar\Approval\Calen
 	 * @param AttendeeResolver $attendees internal guest list
 	 * @param Scheduling $scheduling honest report of what was scheduled
 	 * @param ITimeFactory $time clock
+	 * @param IConfig $config per-account creation timezone
 	 */
 	public function __construct(
 		private ScopedCalendarAccess $access,
@@ -57,6 +59,7 @@ final class CreateEventDraft implements \OCA\Mcp\Modules\Calendar\Approval\Calen
 		private AttendeeResolver $attendees,
 		private Scheduling $scheduling,
 		private ITimeFactory $time,
+		private IConfig $config,
 	) {}
 
 	/**
@@ -83,7 +86,9 @@ final class CreateEventDraft implements \OCA\Mcp\Modules\Calendar\Approval\Calen
 		if (($confirmation = $this->guard->confirm($calendar, $userId, $arguments)) !== null) {
 			return $confirmation;
 		}
-		$timing = $this->dates->timing($arguments['start'], $arguments['end'], (bool)($arguments['allDay'] ?? false), $arguments['timeZone'] ?? null);
+		$defaultZone = $this->config->getUserValue($userId, 'mcp', 'calendar_create_timezone', '');
+		$timing = $this->dates->timing($arguments['start'], $arguments['end'], (bool)($arguments['allDay'] ?? false),
+			$arguments['timeZone'] ?? ($defaultZone !== '' ? $defaultZone : null));
 		$guests = $this->attendees->resolve($arguments['attendees'] ?? [], $userId);
 		$organizer = $guests === [] ? null : $this->attendees->organizer($userId);
 		$uid = $this->newUid();

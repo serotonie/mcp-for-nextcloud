@@ -247,7 +247,7 @@ final class ToolErrorsLanguagesTest extends TestCase {
 		$attendees = new AttendeeResolver($users);
 		$scheduling = new Scheduling($appConfig);
 		$relocator = new EventRelocator($access, $store, $dav, $repository);
-		$createEvent = new CreateEventDraft($access, $guard, $dav, $store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time);
+		$createEvent = new CreateEventDraft($access, $guard, $dav, $store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time, $config);
 		$updateEvent = new UpdateEventDraft($access, $guard, $dav, $store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time);
 		$moveEvent = new MoveEventDraft($access, $relocator, $guard);
 		$deleteEvent = new DeleteEventDraft($access, $guard, $dav, $store, $repository, new TrashPolicy($config), $scheduling);
