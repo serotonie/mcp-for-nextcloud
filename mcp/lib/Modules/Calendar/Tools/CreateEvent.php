@@ -46,7 +46,7 @@ final class CreateEvent implements WriteTool {
 				'start' => CalendarSchema::date(CalendarMessages::propertyDescription('start')),
 				'end' => CalendarSchema::date(CalendarMessages::propertyDescription('end')),
 				'allDay' => ['type' => 'boolean', 'default' => false, 'description' => CalendarMessages::PROP_ALL_DAY],
-				'timeZone' => CalendarSchema::text(CalendarMessages::propertyDescription('timezone') . '; uses the account creation default when configured', 1, 64),
+				'timeZone' => CalendarSchema::text(CalendarMessages::propertyDescription('timezone'), 1, 64),
 				'location' => CalendarSchema::text(CalendarMessages::propertyDescription('location'), 0, 255),
 				'description' => CalendarSchema::text(CalendarMessages::propertyDescription('description'), 0, 65536),
 				'alarms' => CalendarSchema::alarms(),
