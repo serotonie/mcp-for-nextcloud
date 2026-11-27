@@ -74,6 +74,26 @@ final class EventBuilder {
 		$zone = $timing->timeZone ?? new DateTimeZone('UTC');
 		$event->add('DTSTART', $timing->start->setTimezone($zone));
 		$event->add('DTEND', $timing->end->setTimezone($zone));
+		if ($this->ambiguous($timing->start, $zone) || $this->ambiguous($timing->end, $zone)
+			|| $event->DTSTART->getDateTime()->getTimestamp() !== $timing->start->getTimestamp()
+			|| $event->DTEND->getDateTime()->getTimestamp() !== $timing->end->getTimestamp()) {
+			$utc = new DateTimeZone('UTC');
+			unset($event->DTSTART, $event->DTEND);
+			$event->add('DTSTART', $timing->start->setTimezone($utc));
+			$event->add('DTEND', $timing->end->setTimezone($utc));
+		}
+	}
+
+	private function ambiguous(DateTimeImmutable $instant, DateTimeZone $zone): bool {
+		$timestamp = $instant->getTimestamp();
+		$local = $instant->setTimezone($zone);
+		foreach ($zone->getTransitions($timestamp - 172800, $timestamp + 172800) ?: [] as $transition) {
+			$other = $timestamp + $local->getOffset() - $transition['offset'];
+			if ($other !== $timestamp && $instant->setTimestamp($other)->setTimezone($zone)->format('YmdHis') === $local->format('YmdHis')) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

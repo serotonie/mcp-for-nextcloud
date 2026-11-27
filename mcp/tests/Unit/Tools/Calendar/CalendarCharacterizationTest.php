@@ -229,7 +229,7 @@ final class CalendarCharacterizationTest extends TestCase {
 		$scheduling = new Scheduling($appConfig);
 		$relocator = new EventRelocator($access, $store, $dav, $repository);
 		return match ($tool) {
-			'calendar_create_event' => new CreateEventDraft($access, $guard, $dav, $store, $repository, new EventBuilder(), new EventMapper(), new DateInput(), new AttendeeResolver($users), $scheduling, $time),
+			'calendar_create_event' => new CreateEventDraft($access, $guard, $dav, $store, $repository, new EventBuilder(), new EventMapper(), new DateInput(), new AttendeeResolver($users), $scheduling, $time, $this->config()),
 			'calendar_move_event' => new MoveEventDraft($access, $relocator, $guard),
 			'calendar_transfer_event' => new TransferEventDraft($relocator),
 			'calendar_delete_event' => new DeleteEventDraft($access, $guard, $dav, $store, $repository, new TrashPolicy($this->config()), $scheduling),

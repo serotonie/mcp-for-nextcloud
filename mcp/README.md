@@ -43,6 +43,14 @@ A user or group with an earlier Tables/Collectives Full that lacks the new opera
 
 ## Calendar reminders
 
+For timed events created without an explicit `timeZone`, an administrator can
+set a per-account creation default with
+`occ user:setting USER mcp calendar_create_timezone Europe/Zurich`. Without
+this setting, the existing UTC default remains. An explicit `timeZone` takes
+precedence. If an endpoint falls in a repeated daylight-saving hour, the
+event is written in UTC to preserve its exact instants. All-day dates are
+unaffected.
+
 `calendar_create_event` and `calendar_update_event` accept optional `alarms`, a list of 0–5 objects with integer `minutesBefore` from 0 to 40320 and optional `description` of at most 65536 characters. Omitted or empty descriptions use the final event title, or "Event reminder" when that title is empty. Duplicate reminders are retained. Without `alarms`, behavior remains unchanged: create adds none and update preserves existing VALARM components.
 
 When present on update, the list replaces only valid DISPLAY alarms relative to the master event's start; `[]` removes that subset. Absolute, end-relative, AUDIO/EMAIL and unrecognized alarms remain. Overrides keep their own alarms; this does not update every recurrence. The plan shows replaced and preserved alarms. The receipt reports server observation, not notification delivery on a device. Existing confirmation, shared-calendar checks and DAV ETag rules apply. L01 adds no `plan_state` or approval token: on update, omitting the event ETag leaves changes between preview and confirmation unprotected. There is no new alarm grant, automatic retry or rollback.

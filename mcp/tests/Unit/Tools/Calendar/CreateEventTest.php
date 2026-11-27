@@ -13,6 +13,7 @@ use Sabre\VObject\Reader;
 
 final class CreateEventTest extends CalendarTestCase {
 	public function testCreatesTimedEventWithTimeZone(): void {
+		$this->creationTimezone = 'Europe/Zurich';
 		$item = self::json($this->call('calendar_create_event', [
 			'calendar' => self::PERSONAL, 'summary' => 'Consulta', 'start' => '2026-03-12T09:00:00-03:00', 'end' => '2026-03-12T10:00:00-03:00',
 			'timeZone' => 'America/Sao_Paulo', 'location' => 'Centro', 'description' => 'Levar exames',
@@ -32,6 +33,47 @@ final class CreateEventTest extends CalendarTestCase {
 		$this->assertSame('20260312T090000', $event->DTSTART->getValue());
 		$this->assertSame(['Centro', 'Levar exames', '0'], [(string)$event->LOCATION, (string)$event->DESCRIPTION, (string)$event->SEQUENCE]);
 		$this->assertFalse(isset($event->RRULE));
+	}
+
+	public function testCreatesTimedEventInZurichByDefault(): void {
+		$this->creationTimezone = 'Europe/Zurich';
+		$item = self::json($this->call('calendar_create_event', [
+			'calendar' => self::PERSONAL, 'summary' => 'Test', 'start' => '2026-11-23T17:00:00Z', 'end' => '2026-11-23T19:00:00Z',
+		]));
+		$event = Reader::read($this->dav->calls[0][1][2])->VEVENT;
+		$this->assertSame('Europe/Zurich', $item['timeZone']);
+		$this->assertSame(['Europe/Zurich', '20261123T180000', 'Europe/Zurich', '20261123T200000'],
+			[(string)$event->DTSTART['TZID'], (string)$event->DTSTART, (string)$event->DTEND['TZID'], (string)$event->DTEND]);
+	}
+
+	public function testAmbiguousZurichTimeRetainsTheInstantInUtc(): void {
+		$this->creationTimezone = 'Europe/Zurich';
+		$this->call('calendar_create_event', [
+			'calendar' => self::PERSONAL, 'summary' => 'Test', 'start' => '2026-10-25T00:30:00Z', 'end' => '2026-10-25T01:30:00Z',
+		]);
+		$event = Reader::read($this->dav->calls[0][1][2])->VEVENT;
+		$this->assertSame(['20261025T003000Z', '20261025T013000Z'], [(string)$event->DTSTART, (string)$event->DTEND]);
+	}
+
+	public function testSecondOccurrenceOfAmbiguousTimeAlsoUsesUtc(): void {
+		$this->creationTimezone = 'Europe/Zurich';
+		$this->call('calendar_create_event', [
+			'calendar' => self::PERSONAL, 'summary' => 'Test', 'start' => '2026-10-25T01:30:00Z', 'end' => '2026-10-25T02:30:00Z',
+		]);
+		$event = Reader::read($this->dav->calls[0][1][2])->VEVENT;
+		$this->assertSame(['20261025T013000Z', '20261025T023000Z'], [(string)$event->DTSTART, (string)$event->DTEND]);
+	}
+
+	public function testInvalidConfiguredCreationTimezoneIsRefused(): void {
+		$this->creationTimezone = 'Not/A_Timezone';
+		try {
+			$this->call('calendar_create_event', [
+				'calendar' => self::PERSONAL, 'summary' => 'Test', 'start' => '2026-11-23T17:00:00Z', 'end' => '2026-11-23T19:00:00Z',
+			]);
+			$this->fail('expected an invalid configured timezone to be refused');
+		} catch (CalendarArgumentException) {
+			$this->assertNoWrites();
+		}
 	}
 
 	public function testCreatesAllDayEventInSharedWritableCalendar(): void {

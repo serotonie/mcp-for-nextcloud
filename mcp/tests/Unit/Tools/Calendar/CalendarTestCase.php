@@ -81,6 +81,7 @@ abstract class CalendarTestCase extends TestCase {
 	protected array $availabilityAsked = [];
 	/** Timezone of alice's account, as UserTimezone reads it. */
 	protected string $accountTimezone = 'America/Sao_Paulo';
+	protected string $creationTimezone = '';
 	/** @var array<string,string> Explicit timezone preferences for additional diagnostic actors. */
 	protected array $accountTimezones = [];
 	/** @var list<string> e-mail addresses the availability API gives no verdict for */
@@ -111,6 +112,7 @@ abstract class CalendarTestCase extends TestCase {
 		$config = $this->createMock(IConfig::class);
 		$config->method('getAppValue')->willReturnCallback(fn (string $app, string $key) => $app === 'dav' && $key === 'calendarRetentionObligation' ? $this->retention : '');
 		$config->method('getSystemValueString')->willReturn('34.0.4.0');
+		$config->method('getUserValue')->willReturnCallback(fn (string $uid, string $app, string $key) => $app === 'mcp' && $key === 'calendar_create_timezone' ? $this->creationTimezone : '');
 		$logger = $this->createMock(LoggerInterface::class);
 
 		$this->scope = new ScopeStub();
@@ -126,7 +128,7 @@ abstract class CalendarTestCase extends TestCase {
 		$scheduling = new Scheduling($appConfig);
 		$listCalendars = new ListCalendarsHandler($access);
 		$listEvents = new ListEventsHandler($access, $this->store, $repository, $classification, new EventExpander(), $mapper, $dates, $time, $logger);
-		$createEvent = new CreateEventDraft($access, $guard, $this->dav, $this->store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time);
+		$createEvent = new CreateEventDraft($access, $guard, $this->dav, $this->store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time, $config);
 		$updateEvent = new UpdateEventDraft($access, $guard, $this->dav, $this->store, $repository, $builder, $mapper, $dates, $attendees, $scheduling, $time);
 		$moveEvent = new MoveEventDraft($access, $relocator, $guard);
 		$deleteEvent = new DeleteEventDraft($access, $guard, $this->dav, $this->store, $repository, new TrashPolicy($config), $scheduling);
